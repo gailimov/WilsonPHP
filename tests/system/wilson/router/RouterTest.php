@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../../bootstrap.php';
-
 use wilson\router\Router,
     wilson\router\Exception,
     wilson\Request;

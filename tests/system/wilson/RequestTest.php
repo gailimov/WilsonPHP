@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../bootstrap.php';
-
 use wilson\Request;
 
 class RequestTest extends PHPUnit_Framework_TestCase

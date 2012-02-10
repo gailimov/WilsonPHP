@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../../../../bootstrap.php';
-
 use wilson\router\type\RegexRouter;
 
 class RegexRouterTest extends PHPUnit_Framework_TestCase
