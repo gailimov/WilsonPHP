@@ -12,7 +12,8 @@ namespace wilson\router;
 use wilson\Request,
     wilson\router\type\RouterInterface,
     wilson\router\type\StaticRouter,
-    wilson\router\type\RegexRouter;
+    wilson\router\type\RegexRouter,
+    wilson\router\type\SegmentRouter;
 
 /**
  * Router
@@ -21,6 +22,31 @@ use wilson\Request,
  */
 class Router
 {
+    /**
+     * Type key
+     */
+    const TYPE_KEY = 'type';
+    
+    /**
+     * Static router type
+     */
+    const TYPE_STATIC = 'static';
+    
+    /**
+     * Regex router type
+     */
+    const TYPE_REGEX = 'regex';
+    
+    /**
+     * Segment router type
+     */
+    const TYPE_SEGMENT = 'segment';
+    
+    /**
+     * URL key
+     */
+    const URL_KEY = 'url';
+    
     /**
      * Routes
      * 
@@ -134,12 +160,12 @@ class Router
             if ($routeName == $name) {
                 $replacement = ($params) ? '%s' : '';
                 // Static route
-                if (isset($route['url'])) {
-                    $url = $route['url'];
+                if ($route[self::TYPE_KEY] == self::TYPE_STATIC) {
+                    $url = $route[self::URL_KEY];
                 // Regex route
                 } else {
                     /** @TODO: Пофиксить, чтобы заменялись только именованный параметры, с соотвествующим ключем в params */
-                    $url = preg_replace('/\([^\)]*\)/', $replacement, $route['pattern']);
+                    $url = preg_replace('/\([^\)]*\)/', $replacement, $route[self::URL_KEY]);
                     $url = str_replace('^', '', $url);
                     $url = str_replace('$', '', $url);
                 }
@@ -176,7 +202,7 @@ class Router
             return $this->route();
         }
         
-        return $this->route($this->getRouterType($request));
+        return $this->route($this->getRouterType());
     }
     
     /**
@@ -198,18 +224,20 @@ class Router
     }
     
     /**
-     * Returns routes by name of comparable
+     * Returns routes by type
      * 
-     * @param  string $comparableName Name of comparable
+     * @param  string $type Router type
      * @return array
      */
-    private function getRoutesByComparableName($comparableName)
+    private function getRoutesByType($type)
     {
         $routes = array();
         
         foreach ($this->_routes as $name => $route) {
-            if (isset($route[(string) $comparableName]))
-                $routes[$name] = $route;
+            if ($route[self::TYPE_KEY] == $type) {
+                if (isset($route[self::URL_KEY]))
+                    $routes[$name] = $route;
+            }
         }
         
         return $routes;
@@ -218,29 +246,28 @@ class Router
     /**
      * Returns router type
      * 
-     * @param  object \wilson\Request
-     * @return array
+     * @return void
      */
-    private function getRouterType(Request $request)
+    private function getRouterType()
     {
         foreach ($this->_routes as $name => $route) {
-            if (isset($route['type'])) {
-                switch ($route['type']) {
-                    case 'static':
-                        $routes = $this->getRoutesByComparableName('url');
-                        $this->_router = new StaticRouter();
-                        if ($this->_router->match($this->_uri, $routes))
-                            return $routes;
-                    case 'regex':
-                        $routes = $this->getRoutesByComparableName('pattern');
-                        $this->_router = new RegexRouter();
-                        if ($this->_router->match($this->_uri, $routes))
-                            return $routes;
-                    case 'standartRegex':
-                        $routes = $this->getRoutesByComparableName('uriPattern');
-                        $this->_router = new StandartRegexRouter();
-                        if ($this->_router->match($this->_uri, $routes))
-                            return $routes;
+            if (isset($route[self::TYPE_KEY])) {
+                switch ($route[self::TYPE_KEY]) {
+                    case self::TYPE_STATIC:
+                        $routes = $this->getRoutesByType(self::TYPE_STATIC);
+                        $this->_router = new StaticRouter($routes);
+                        if ($this->_router->match($this->_uri))
+                            return;
+                    case self::TYPE_REGEX:
+                        $routes = $this->getRoutesByType(self::TYPE_REGEX);
+                        $this->_router = new RegexRouter($routes);
+                        if ($this->_router->match($this->_uri))
+                            return;
+                    case self::TYPE_SEGMENT:
+                        $routes = $this->getRoutesByType(self::TYPE_SEGMENT);
+                        $this->_router = new SegmentRouter($routes);
+                        if ($this->_router->match($this->_uri))
+                            return;
                     default:
                         $this->_router = new StandartRouter();
                 }
@@ -251,15 +278,12 @@ class Router
     /**
      * Routing
      * 
-     * @param  array $routes Routes
      * @return array
      */
-    private function route(array $routes = null)
+    private function route()
     {
         if ($this->_router instanceof RouterInterface)
-            return $this->_router->route($this->_router->getActiveRouteName($this->_uri, $routes), $this->_routes);
-        elseif ($this->_router instanceof StandartRegexRouter)
-            return $this->_router->route($this->_router->getActiveRouteName($this->_uri, $routes));
+            return $this->_router->route($this->_router->getActiveRouteName($this->_uri));
         else
             return $this->_router->route($this->_uri);
     }

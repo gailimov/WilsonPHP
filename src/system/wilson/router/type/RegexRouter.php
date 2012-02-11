@@ -14,7 +14,7 @@ namespace wilson\router\type;
  * 
  * @author Kanat Gailimov <gailimov@gmail.com>
  */
-class RegexRouter implements RouterInterface
+class RegexRouter extends RouterAbstract
 {
     /**
      * Params
@@ -28,27 +28,17 @@ class RegexRouter implements RouterInterface
      * 
      * Usage example:
      * 
-     *     $route = array(
-     *         'article' => array(
-     *             'type' => 'regex',
-     *             'pattern' => '^article/(?P<slug>[-_a-z0-9]+)$',
-     *             'module' => 'articles',
-     *             'controller' => 'articles',
-     *             'action' => 'show'
-     *         )
-     *     );
-     *     if ($router->match('article/something', $route)) {
+     *     if ($router->match('article/something')) {
      *         // ...
      *     }
      * 
-     * @param  string $uri    URI
-     * @param  array  $routes Routes
+     * @param  string $uri URI
      * @return bool
      */
-    public function match($uri, array $routes)
+    public function match($uri)
     {
-        foreach ($routes as $name => $route) {
-            if (preg_match('#' . $route['pattern'] . '#', (string) $uri, $matches))
+        foreach ($this->_routes as $name => $route) {
+            if (preg_match('#' . $route[self::URL_KEY] . '#', (string) $uri))
                 return true;
         }
         
@@ -58,17 +48,19 @@ class RegexRouter implements RouterInterface
     /**
      * Returns active route's name if route matches to URI, otherwise returns false
      * 
-     * @param  string $uri    URI
-     * @param  array  $routes Routes
+     * @param  string $uri URI
      * @return string || bool false
      */
-    public function getActiveRouteName($uri, array $routes)
+    public function getActiveRouteName($uri)
     {
-        foreach ($routes as $name => $route) {
-            if (preg_match('#' . $route['pattern'] . '#', (string) $uri, $matches)) {
+        foreach ($this->_routes as $name => $route) {
+            if (preg_match('#' . $route[self::URL_KEY] . '#', (string) $uri, $matches)) {
                 foreach ($matches as $key => $value) {
-                    if (preg_match('/[_a-zA-Z]/', $key))
-                        $this->_params[$key] = $value;
+                    // Skip all unnamed keys
+                    if (is_int($key))
+                        continue;
+                    // Set the value for all matched keys
+                    $this->_params[$key] = $value;
                 }
                 $this->_params = $_GET = array_merge($this->_params, $_GET);
                 return $name;
@@ -81,19 +73,15 @@ class RegexRouter implements RouterInterface
     /**
      * Routing
      * 
-     * @param  string $name   Route name
-     * @param  array  $routes Routes
+     * @param  string $name Route name
      * @return array
      */
-    public function route($name, array $routes)
+    public function route($name)
     {
-        if (isset($routes[(string) $name])) {
-            return array(
-                'module' => $routes[$name]['module'],
-                'controller' => $routes[$name]['controller'],
-                'action' => $routes[$name]['action'],
-                'params' => $this->_params
-            );
+        if (isset($this->_routes[(string) $name])) {
+            $routes = $this->getRoute($name, array('module', 'controller', 'action'));
+            $routes['params'] = $this->_params;
+            return $routes;
         }
         
         return array();

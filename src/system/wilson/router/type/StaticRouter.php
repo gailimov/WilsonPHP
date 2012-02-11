@@ -14,33 +14,24 @@ namespace wilson\router\type;
  * 
  * @author Kanat Gailimov <gailimov@gmail.com>
  */
-class StaticRouter implements RouterInterface
+class StaticRouter extends RouterAbstract
 {
     /**
      * Returns true if route matches to URI, otherwise returns false
      * 
      * Usage example:
      * 
-     *     $route = array(
-     *         'sitemap' => array(
-     *             'type' => 'static',
-     *             'url' => 'sitemap',
-     *             'controller' => 'site',
-     *             'action' => 'sitemap'
-     *         )
-     *     );
-     *     if ($router->match('sitemap', $route)) {
+     *     if ($router->match('sitemap')) {
      *         // ...
      *     }
      * 
-     * @param  string $uri    URI
-     * @param  array  $routes Routes
+     * @param  string $uri URI
      * @return bool
      */
-    public function match($uri, array $routes)
+    public function match($uri)
     {
-        foreach ($routes as $name => $route) {
-            if ($route['url'] == (string) $uri)
+        foreach ($this->_routes as $name => $route) {
+            if ($route[self::URL_KEY] == (string) $uri)
                 return true;
         }
         
@@ -50,14 +41,13 @@ class StaticRouter implements RouterInterface
     /**
      * Returns active route's name if route matches to URI, otherwise returns false
      * 
-     * @param  string $uri    URI
-     * @param  array  $routes Routes
+     * @param  string $uri URI
      * @return string || bool false
      */
-    public function getActiveRouteName($uri, array $routes)
+    public function getActiveRouteName($uri)
     {
-        foreach ($routes as $name => $route) {
-            if ($route['url'] == (string) $uri)
+        foreach ($this->_routes as $name => $route) {
+            if ($route[self::URL_KEY] == (string) $uri)
                 return $name;
         }
         
@@ -67,18 +57,14 @@ class StaticRouter implements RouterInterface
     /**
      * Routing
      * 
-     * @param  string $name   Route name
-     * @param  array  $routes Routes
+     * @param  string $name Route name
      * @return array
      */
-    public function route($name, array $routes)
+    public function route($name)
     {
-        if (isset($routes[(string) $name])) {
-            return array(
-                'module' => $routes[$name]['module'],
-                'controller' => $routes[$name]['controller'],
-                'action' => $routes[$name]['action']
-            );
+        if (isset($this->_routes[(string) $name])) {
+            $routes = $this->getRoute($name, array('module', 'controller', 'action'));
+            return $routes;
         }
         
         return array();

@@ -18,32 +18,25 @@ return array(
         ),
         /*'greeting' => array(
             'type' => 'regex',
-            'pattern' => '^hello/(?P<name>[-_a-z0-9]+)$',
+            'url' => '^hello/(?P<name>[-_a-z0-9]+)$',
             'module' => 'main',
             'controller' => 'site',
             'action' => 'greet'
         ),*/
         'greeting' => array(
-            'type' => 'standartRegex',
-            'uriPattern' => 'hello(/<name>)',
+            'type' => 'segment',
+            'url' => 'hello(/<name>)',
             'rules' => array(
                 'name' => '[-_a-z0-9]+'
             ),
-            'defaults' => array(
-                'module' => 'main',
-                'controller' => 'site',
-                'action' => 'greet'
-            )
+            'module' => 'main',
+            'controller' => 'site',
+            'action' => 'greet'
         ),
         'default' => array(
-            'type' => 'standartRegex',
-            'uriPattern' => '<controller>(/<action>(/<name>))',
-            'rules' => array(
-                'module' => '[-_a-z]+'
-            ),
-            'defaults' => array(
-                'module' => 'blog'
-            )
+            'type' => 'segment',
+            'url' => '<controller>(/<action>(/<name>))',
+            'module' => 'blog'
         )
     ),
     

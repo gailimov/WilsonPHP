@@ -13,6 +13,6 @@ class Posts extends Controller
     
     public function showAction()
     {
-        echo 'blog::Posts::index(). Param: ' . $this->getParam('name', 'default');
+        echo 'blog::Posts::index(' . $this->getParam('name', 'default') . ')';
     }
 }

@@ -19,27 +19,24 @@ interface RouterInterface
     /**
      * Returns true if route matches to URI, otherwise returns false
      * 
-     * @param  string $uri    URI
-     * @param  array  $routes Routes
+     * @param  string $uri URI
      * @return bool
      */
-    public function match($uri, array $routes);
+    public function match($uri);
     
     /**
      * Returns active route's name if route matches to URI, otherwise returns false
      * 
-     * @param  string $uri    URI
-     * @param  array  $routes Routes
+     * @param  string $uri URI
      * @return string || bool false
      */
-    public function getActiveRouteName($uri, array $routes);
+    public function getActiveRouteName($uri);
     
     /**
      * Routing
      * 
-     * @param  string $name   Route name
-     * @param  array  $routes Routes
+     * @param  string $name Route name
      * @return array
      */
-    public function route($name, array $routes);
+    public function route($name);
 }
