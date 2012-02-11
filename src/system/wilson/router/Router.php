@@ -236,6 +236,11 @@ class Router
                         $this->_router = new RegexRouter();
                         if ($this->_router->match($this->_uri, $routes))
                             return $routes;
+                    case 'standartRegex':
+                        $routes = $this->getRoutesByComparableName('uriPattern');
+                        $this->_router = new StandartRegexRouter();
+                        if ($this->_router->match($this->_uri, $routes))
+                            return $routes;
                     default:
                         $this->_router = new StandartRouter();
                 }
@@ -253,6 +258,8 @@ class Router
     {
         if ($this->_router instanceof RouterInterface)
             return $this->_router->route($this->_router->getActiveRouteName($this->_uri, $routes), $this->_routes);
+        elseif ($this->_router instanceof StandartRegexRouter)
+            return $this->_router->route($this->_router->getActiveRouteName($this->_uri, $routes));
         else
             return $this->_router->route($this->_uri);
     }
