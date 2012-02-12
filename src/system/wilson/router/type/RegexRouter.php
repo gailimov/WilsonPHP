@@ -24,6 +24,16 @@ class RegexRouter extends RouterAbstract
     private $_params = array();
     
     /**
+     * Returns type
+     * 
+     * @return string
+     */
+    public function getType()
+    {
+        return 'regex';
+    }
+    
+    /**
      * Returns true if route matches to URI, otherwise returns false
      * 
      * Usage example:

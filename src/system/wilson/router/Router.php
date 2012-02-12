@@ -10,10 +10,7 @@
 namespace wilson\router;
 
 use wilson\Request,
-    wilson\router\type\RouterInterface,
-    wilson\router\type\StaticRouter,
-    wilson\router\type\RegexRouter,
-    wilson\router\type\SegmentRouter;
+    wilson\router\type\RouterInterface;
 
 /**
  * Router
@@ -55,6 +52,13 @@ class Router
     private $_routes = array();
     
     /**
+     * Router types
+     * 
+     * @var array
+     */
+    private $_types = array();
+    
+    /**
      * @var \wilson\Request
      */
     private $_request;
@@ -65,13 +69,6 @@ class Router
      * @var string
      */
     private $_uri;
-    
-    /**
-     * Router instance
-     * 
-     * @var object
-     */
-    private $_router;
     
     /**
      * Adds route
@@ -139,6 +136,54 @@ class Router
     }
     
     /**
+     * Adds router type
+     * 
+     * Usage example:
+     * 
+     *     $router->addType(new StaticRouter());
+     * 
+     * @param  wilson\router\type\RouterInterface $type Type
+     * @return wilson\router\Router
+     */
+    public function addType(RouterInterface $type)
+    {
+        $this->_types[$type->getType()] = $type;
+        return $this;
+    }
+    
+    /**
+     * Adds routers types
+     * 
+     * Usage example:
+     * 
+     *     $router->addTypes(array(
+     *         new StaticRouter(),
+     *         new RegexRouter(),
+     *         new SegmentRouter()
+     *     ));
+     * 
+     * @param  array $types Types
+     * @return wilson\router\Router
+     */
+    public function addTypes(array $types)
+    {
+        foreach ($types as $type)
+            $this->addType($type);
+        return $this;
+    }
+    
+    /**
+     * Returns router by type
+     * 
+     * @param  string $type Type
+     * @return wilson\router\type\RouterInterface
+     */
+    public function getRouterByType($type)
+    {
+        return $this->_types[(string) $type];
+    }
+    
+    /**
      * Creates URL
      * 
      * Usage example:
@@ -197,12 +242,7 @@ class Router
         $this->_request = $request;
         $this->_uri = $this->getUri($request);
         
-        if (empty($this->_routes)) {
-            $this->_router = new StandartRouter();
-            return $this->route();
-        }
-        
-        return $this->route($this->getRouterType());
+        return $this->route();
     }
     
     /**
@@ -234,7 +274,7 @@ class Router
         $routes = array();
         
         foreach ($this->_routes as $name => $route) {
-            if ($route[self::TYPE_KEY] == $type) {
+            if ($route[self::TYPE_KEY] == (string) $type) {
                 if (isset($route[self::URL_KEY]))
                     $routes[$name] = $route;
             }
@@ -244,47 +284,22 @@ class Router
     }
     
     /**
-     * Returns router type
-     * 
-     * @return void
-     */
-    private function getRouterType()
-    {
-        foreach ($this->_routes as $name => $route) {
-            if (isset($route[self::TYPE_KEY])) {
-                switch ($route[self::TYPE_KEY]) {
-                    case self::TYPE_STATIC:
-                        $routes = $this->getRoutesByType(self::TYPE_STATIC);
-                        $this->_router = new StaticRouter($routes);
-                        if ($this->_router->match($this->_uri))
-                            return;
-                    case self::TYPE_REGEX:
-                        $routes = $this->getRoutesByType(self::TYPE_REGEX);
-                        $this->_router = new RegexRouter($routes);
-                        if ($this->_router->match($this->_uri))
-                            return;
-                    case self::TYPE_SEGMENT:
-                        $routes = $this->getRoutesByType(self::TYPE_SEGMENT);
-                        $this->_router = new SegmentRouter($routes);
-                        if ($this->_router->match($this->_uri))
-                            return;
-                    default:
-                        $this->_router = new StandartRouter();
-                }
-            }
-        }
-    }
-    
-    /**
      * Routing
      * 
      * @return array
      */
     private function route()
     {
-        if ($this->_router instanceof RouterInterface)
-            return $this->_router->route($this->_router->getActiveRouteName($this->_uri));
-        else
-            return $this->_router->route($this->_uri);
+        foreach ($this->_routes as $name => $route) {
+            $router = $this->getRouterByType($route[self::TYPE_KEY]);
+            $routes = $this->getRoutesByType($router->getType());
+            $router->addRoutes($routes);
+            if ($router->match($this->_uri))
+                return $router->route($router->getActiveRouteName($this->_uri));
+        }
+        
+        // Nothing matched - standart routing
+        $router = new StandartRouter();
+        return $router->route($this->_uri);
     }
 }

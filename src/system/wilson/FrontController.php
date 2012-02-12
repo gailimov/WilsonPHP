@@ -10,7 +10,10 @@
 namespace wilson;
 
 use Symfony\Component\ClassLoader\UniversalClassLoader,
-    wilson\router\Router;
+    wilson\router\Router,
+    wilson\router\type\StaticRouter,
+    wilson\router\type\RegexRouter,
+    wilson\router\type\SegmentRouter;
 
 /**
  * Front Controller
@@ -411,11 +414,17 @@ class FrontController
      */
     private function dispatch(Request $request)
     {
-        if (isset($this->config['routes']))
-            $this->getRouter()->addRoutes($this->config['routes']);
-        $options = $this->getRouter()->run($request);
+        if (isset($this->config['routes'])) {
+            $this->getRouter()
+                ->addTypes(array(
+                    new StaticRouter(),
+                    new RegexRouter(),
+                    new SegmentRouter()
+                ))
+                ->addRoutes($this->config['routes']);
+        }
         
-        $options = $this->ensureRouteOptions($options);
+        $options = $this->ensureRouteOptions($this->getRouter()->run($request));
         
         $this->ensure(file_exists($this->config['basePath'] . '/' . $this->_modulesDir . '/' . $options['module']),
                       'Module "' . $options['module'] . '" not found');

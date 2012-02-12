@@ -29,11 +29,12 @@ abstract class RouterAbstract implements RouterInterface
     protected $_routes = array();
     
     /**
-     * Constructor
+     * Adds routes
      * 
-     * @param array $routes Routes
+     * @param  array $routes Routes
+     * @return wilson\router\type\RouterAbstract
      */
-    public function __construct(array $routes)
+    public function addRoutes(array $routes)
     {
         $this->_routes = $routes;
     }

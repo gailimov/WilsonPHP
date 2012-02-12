@@ -17,6 +17,16 @@ namespace wilson\router\type;
 class StaticRouter extends RouterAbstract
 {
     /**
+     * Returns type
+     * 
+     * @return string
+     */
+    public function getType()
+    {
+        return 'static';
+    }
+    
+    /**
      * Returns true if route matches to URI, otherwise returns false
      * 
      * Usage example:

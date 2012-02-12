@@ -17,6 +17,13 @@ namespace wilson\router\type;
 interface RouterInterface
 {
     /**
+     * Returns type
+     * 
+     * @return string
+     */
+    public function getType();
+    
+    /**
      * Returns true if route matches to URI, otherwise returns false
      * 
      * @param  string $uri URI
