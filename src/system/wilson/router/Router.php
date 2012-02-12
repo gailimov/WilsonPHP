@@ -173,17 +173,6 @@ class Router
     }
     
     /**
-     * Returns router by type
-     * 
-     * @param  string $type Type
-     * @return wilson\router\type\RouterInterface
-     */
-    public function getRouterByType($type)
-    {
-        return $this->_types[(string) $type];
-    }
-    
-    /**
      * Creates URL
      * 
      * Usage example:
@@ -261,6 +250,17 @@ class Router
         $uri = preg_replace('/[^0-9A-Za-z._\\-\\/]is/', '', $uri);
         
         return $uri;
+    }
+    
+    /**
+     * Returns router by type
+     * 
+     * @param  string $type Type
+     * @return wilson\router\type\RouterInterface
+     */
+    private function getRouterByType($type)
+    {
+        return $this->_types[(string) $type];
     }
     
     /**
