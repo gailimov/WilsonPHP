@@ -27,9 +27,9 @@ class SegmentRouter extends RouterAbstract
     const REGEX_ESCAPE = '[.\\+*?[^\\]${}=!|]';
     
     /**
-     * Defines the pattern of a <segment>
+     * Pattern of a <segment>
      */
-    const REGEX_KEY = '<([a-zA-Z0-9_]++)>';
+    const REGEX_PATTERN = '<([a-zA-Z0-9_]++)>';
     
     /**
      * Rules key
@@ -143,7 +143,7 @@ class SegmentRouter extends RouterAbstract
             $search = $matches[0];
             // Remove the parenthesis from the match as the replace
             $replace = substr($matches[0], 1, -1);
-            while (preg_match('#' . self::REGEX_KEY . '#', $replace, $matches)) {
+            while (preg_match('#' . self::REGEX_PATTERN . '#', $replace, $matches)) {
                 list($key, $param) = $matches;
                 if (isset($params[$param])) {
                     // Replace the key with the parameter value
@@ -158,7 +158,7 @@ class SegmentRouter extends RouterAbstract
             $url = str_replace($search, $replace, $url);
         }
         
-        while (preg_match('#' . self::REGEX_KEY . '#', $url, $matches)) {
+        while (preg_match('#' . self::REGEX_PATTERN . '#', $url, $matches)) {
             list($key, $param) = $matches;
             $url = str_replace($key, $params[$param], $url);
         }

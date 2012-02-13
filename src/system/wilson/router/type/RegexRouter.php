@@ -17,6 +17,11 @@ namespace wilson\router\type;
 class RegexRouter extends RouterAbstract
 {
     /**
+     * Pattern of the URL
+     */
+    const REGEX_PATTERN = '^\?P?<(\w+)>(.*?)$';
+    
+    /**
      * Params
      * 
      * @var array
@@ -111,12 +116,30 @@ class RegexRouter extends RouterAbstract
      */
     public function createUrl($url, array $params = null)
     {
-        $replacement = ($params) ? '%s' : '';
-        /** @TODO: Пофиксить, чтобы заменялись только именованный параметры, с соотвествующим ключем в params */
-        $url = preg_replace('/\([^\)]*\)/', $replacement, (string) $url);
+        while (preg_match('#\([^()]++\)#', (string) $url, $matches)) {
+            // Search for the matched value
+            $search = $matches[0];
+            // Remove the parenthesis from the match as the replace
+            $replace = substr($matches[0], 1, -1);
+            while (preg_match('#' . self::REGEX_PATTERN . '#', $replace, $matches)) {
+                list($key, $param) = $matches;
+                if (isset($params[$param])) {
+                    // Replace the key with the parameter value
+                    $replace = str_replace($key, $params[$param], $replace);
+                } else {
+                    // This group has missing parameters
+                    $replace = '';
+                    break;
+                }
+            }
+            
+            // Replace the group in the URL
+            $url = str_replace($search, $replace, $url);
+        }
+        
         $url = str_replace('^', '', $url);
         $url = str_replace('$', '', $url);
         
-        return vsprintf($url, $params);
+        return preg_replace('#//+#', '/', rtrim($url, '/'));
     }
 }
