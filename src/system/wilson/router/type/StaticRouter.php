@@ -79,4 +79,21 @@ class StaticRouter extends RouterAbstract
         
         return array();
     }
+    
+    /**
+     * Creates URL
+     * 
+     * Usage example:
+     * 
+     *     // Generates: /sitemap
+     *     $router->createUrl('sitemap');
+     * 
+     * @param  string $url    URL pattern
+     * @param  array  $params Params
+     * @return string
+     */
+    public function createUrl($url, array $params = null)
+    {
+        return (string) $url;
+    }
 }

@@ -25,21 +25,6 @@ class Router
     const TYPE_KEY = 'type';
     
     /**
-     * Static router type
-     */
-    const TYPE_STATIC = 'static';
-    
-    /**
-     * Regex router type
-     */
-    const TYPE_REGEX = 'regex';
-    
-    /**
-     * Segment router type
-     */
-    const TYPE_SEGMENT = 'segment';
-    
-    /**
      * URL key
      */
     const URL_KEY = 'url';
@@ -192,25 +177,11 @@ class Router
     {
         foreach ($this->_routes as $routeName => $route) {
             if ($routeName == $name) {
-                $replacement = ($params) ? '%s' : '';
-                // Static route
-                if ($route[self::TYPE_KEY] == self::TYPE_STATIC) {
-                    $url = $route[self::URL_KEY];
-                // Regex route
-                } else {
-                    /** @TODO: Пофиксить, чтобы заменялись только именованный параметры, с соотвествующим ключем в params */
-                    $url = preg_replace('/\([^\)]*\)/', $replacement, $route[self::URL_KEY]);
-                    $url = str_replace('^', '', $url);
-                    $url = str_replace('$', '', $url);
-                }
-                
-                if (!$absolute) {
-                    if ($params)
-                        return $this->_request->getScriptUrl() . vsprintf($url, $params);
+                $url = $this->getRouterByType($route[self::TYPE_KEY])->createUrl($route[self::URL_KEY], $params);
+                if (!$absolute)
                     return $this->_request->getScriptUrl() . $url;
-                } else {
+                else
                     return $this->_request->getHostInfo($https) . $this->createUrl($name, $params);
-                }
             }
         }
         

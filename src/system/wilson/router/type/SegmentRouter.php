@@ -27,6 +27,11 @@ class SegmentRouter extends RouterAbstract
     const REGEX_ESCAPE = '[.\\+*?[^\\]${}=!|]';
     
     /**
+     * Defines the pattern of a <segment>
+     */
+    const REGEX_KEY = '<([a-zA-Z0-9_]++)>';
+    
+    /**
      * Rules key
      */
     const RULES_KEY = 'rules';
@@ -117,6 +122,49 @@ class SegmentRouter extends RouterAbstract
         }
         
         return array();
+    }
+    
+    /**
+     * Creates URL
+     * 
+     * Usage example:
+     * 
+     *     // Generates: /article/something
+     *     $router->createUrl('article/<slug>', array('slug' => 'something'));
+     * 
+     * @param  string $url    URL pattern
+     * @param  array  $params Params
+     * @return string
+     */
+    public function createUrl($url, array $params = null)
+    {
+        while (preg_match('#\([^()]++\)#', (string) $url, $matches)) {
+            // Search for the matched value
+            $search = $matches[0];
+            // Remove the parenthesis from the match as the replace
+            $replace = substr($matches[0], 1, -1);
+            while (preg_match('#' . self::REGEX_KEY . '#', $replace, $matches)) {
+                list($key, $param) = $matches;
+                if (isset($params[$param])) {
+                    // Replace the key with the parameter value
+                    $replace = str_replace($key, $params[$param], $replace);
+                } else {
+                    // This group has missing parameters
+                    $replace = '';
+                    break;
+                }
+            }
+            // Replace the group in the URL
+            $url = str_replace($search, $replace, $url);
+        }
+        
+        while (preg_match('#' . self::REGEX_KEY . '#', $url, $matches)) {
+            list($key, $param) = $matches;
+            $url = str_replace($key, $params[$param], $url);
+        }
+        
+        // Trim all extra slashes from the URL
+        return preg_replace('#//+#', '/', rtrim($url, '/'));
     }
     
     /**

@@ -50,4 +50,9 @@ class StaticRouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($options['controller'], 'site');
         $this->assertEquals($options['action'], 'sitemap');
     }
+    
+    public function testCreateUrl()
+    {
+        $this->assertEquals($this->_router->createUrl('sitemap'), 'sitemap');
+    }
 }

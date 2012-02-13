@@ -55,4 +55,9 @@ class SegmentRouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(gettype($options['params']), 'array');
         $this->assertEquals($options['params'], $_GET);
     }
+    
+    public function testCreateUrl()
+    {
+        $this->assertEquals($this->_router->createUrl('post/<slug>', array('slug' => 'something')), 'post/something');
+    }
 }

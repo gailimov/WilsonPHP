@@ -96,4 +96,27 @@ class RegexRouter extends RouterAbstract
         
         return array();
     }
+    
+    /**
+     * Creates URL
+     * 
+     * Usage example:
+     * 
+     *     // Generates: /article/something
+     *     $router->createUrl('^article/(?P<slug>[-_a-z0-9]+)$', array('slug' => 'something'));
+     * 
+     * @param  string $url    URL pattern
+     * @param  array  $params Params
+     * @return string
+     */
+    public function createUrl($url, array $params = null)
+    {
+        $replacement = ($params) ? '%s' : '';
+        /** @TODO: Пофиксить, чтобы заменялись только именованный параметры, с соотвествующим ключем в params */
+        $url = preg_replace('/\([^\)]*\)/', $replacement, (string) $url);
+        $url = str_replace('^', '', $url);
+        $url = str_replace('$', '', $url);
+        
+        return vsprintf($url, $params);
+    }
 }

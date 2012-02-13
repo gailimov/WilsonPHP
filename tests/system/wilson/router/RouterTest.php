@@ -99,10 +99,10 @@ class RouterTest extends PHPUnit_Framework_TestCase
             'HTTP_HOST' => 'localhost',
             'SCRIPT_NAME' => '/'
         )));
-        $this->assertEquals($this->_router->createUrl('article', array('slug' => 'something')),
-                            '/article/something');
-        $this->assertEquals($this->_router->createUrl('article', array('slug' => 'something'), true, true),
-                            'https://localhost/article/something');
+        $this->assertEquals($this->_router->createUrl('sitemap'), '/sitemap');
+        $this->assertEquals($this->_router->createUrl('sitemap', null, true, true), 'https://localhost/sitemap');
+        $this->assertEquals($this->_router->createUrl('article', array('slug' => 'something')), '/article/something');
+        $this->assertEquals($this->_router->createUrl('post', array('slug' => 'something')), '/post/something');
     }
     
     public function testStandartRouter()

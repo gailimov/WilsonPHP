@@ -52,4 +52,10 @@ class RegexRouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(gettype($options['params']), 'array');
         $this->assertEquals($options['params'], $_GET);
     }
+    
+    public function testCreateUrl()
+    {
+        $this->assertEquals($this->_router->createUrl('^article/(?P<slug>[-_a-z0-9]+)$', array('slug' => 'something')),
+                            'article/something');
+    }
 }

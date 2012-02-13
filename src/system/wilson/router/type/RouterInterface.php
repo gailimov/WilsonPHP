@@ -46,4 +46,13 @@ interface RouterInterface
      * @return array
      */
     public function route($name);
+    
+    /**
+     * Creates URL
+     * 
+     * @param  string $url    URL pattern
+     * @param  array  $params Params
+     * @return string
+     */
+    public function createUrl($url, array $params = null);
 }
