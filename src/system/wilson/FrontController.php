@@ -89,6 +89,13 @@ class FrontController
     private $_moduleId;
     
     /**
+     * Directory ID
+     * 
+     * @var string
+     */
+    private $_directoryId;
+    
+    /**
      * Controller ID
      * 
      * @var string
@@ -280,6 +287,28 @@ class FrontController
     }
     
     /**
+     * Sets directory ID
+     * 
+     * @param  string $directoryId Directory ID
+     * @return \wilson\FrontController
+     */
+    public function setDirectoryId($directoryId)
+    {
+        $this->_directoryId = mb_strtolower((string) $directoryId, 'UTF-8');
+        return $this;
+    }
+    
+    /**
+     * Returns directory ID
+     * 
+     * @return string
+     */
+    public function getDirectoryId()
+    {
+        return $this->_directoryId;
+    }
+    
+    /**
      * Sets controller ID
      * 
      * @param  string $controllerId Controller ID
@@ -431,10 +460,13 @@ class FrontController
         
         $this->setRouteOptions($options);
         
+        $directory = $options['directory'] ? '\\' . $options['directory'] : $options['directory'];
+        
         $class = '\\' . $this->_namespace .
                  '\\' . $this->_modulesDir .
                  '\\' . $options['module'] .
                  '\\' . $this->_controllersDir .
+                        $directory .
                  '\\' . ucfirst($options['controller']);
         
         $this->ensure(class_exists($class), 'Controller class "' . $class . '" not found');
@@ -457,6 +489,8 @@ class FrontController
     {
         if (empty($options['module']))
             $options['module'] = $this->_defaultModule;
+        if (empty($options['directory']))
+            $options['directory'] = null;
         if (empty($options['controller']))
             $options['controller'] = $this->_defaultController;
         if (empty($options['action']))
@@ -477,6 +511,7 @@ class FrontController
     {
         $this->setOptions(array(
             'moduleId' => $options['module'],
+            'directoryId' => $options['directory'],
             'controllerId' => $options['controller'],
             'actionId' => $options['action'],
             'params' => $options['params']

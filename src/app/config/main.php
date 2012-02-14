@@ -33,6 +33,16 @@ return array(
             'controller' => 'site',
             'action' => 'greet'
         ),
+        'admin' => array(
+            'type' => 'segment',
+            'url' => '<directory>(/<controller>(/<action>(/<id>)))',
+            'rules' => array(
+                'id' => '\d+',
+                'directory' => 'admin'
+            ),
+            'module' => 'blog',
+            'controller' => 'posts'
+        ),
         'default' => array(
             'type' => 'segment',
             'url' => '<controller>(/<action>(/<name>))',

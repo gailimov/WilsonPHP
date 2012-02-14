@@ -96,7 +96,7 @@ class SegmentRouter extends RouterAbstract
                 }
                 
                 // Remove module, controller, action from params
-                $this->removeUnnecessaryParams(array('module', 'controller', 'action'));
+                $this->removeUnnecessaryParams(array('module', 'directory', 'controller', 'action'));
                 
                 $this->_params = $_GET = array_merge($this->_params, $_GET);
                 
@@ -116,7 +116,7 @@ class SegmentRouter extends RouterAbstract
     public function route($name)
     {
         if (isset($this->_routes[(string) $name])) {
-            $routes = $this->getRoute($name, array('module', 'controller', 'action'));
+            $routes = $this->getRoute($name, array('module', 'directory', 'controller', 'action'));
             $routes['params'] = $this->_params;
             return $routes;
         }
@@ -217,7 +217,7 @@ class SegmentRouter extends RouterAbstract
      */
     private function setRoutes($name, array $routes)
     {
-        $this->setRoutesIfKeyExists($name, array('module', 'controller', 'action'), $routes);
+        $this->setRoutesIfKeyExists($name, array('module', 'directory', 'controller', 'action'), $routes);
     }
     
     /**

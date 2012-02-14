@@ -88,6 +88,18 @@ class Controller
     }
     
     /**
+     * Returns directory ID
+     * 
+     * @see \wilson\FrontController::getDirectoryId()
+     * 
+     * @return string
+     */
+    public function getDirectoryId()
+    {
+        return FrontController::getInstance()->getDirectoryId();
+    }
+    
+    /**
      * Returns controller ID
      * 
      * @see \wilson\FrontController::getControllerId()
