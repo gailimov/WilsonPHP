@@ -15,15 +15,16 @@ class SegmentRouterTest extends PHPUnit_Framework_TestCase
      * @var array
      */
     private $_routes = array(
-        'post' => array(
+        'admin' => array(
             'type' => 'segment',
-            'url' => 'post/<slug>',
+            'url' => 'admin(/<controller>(/<action>(/<id>)))',
             'rules' => array(
-                'slug' => '[-_a-z0-9]+'
+                'id' => '\d+'
             ),
             'module' => 'blog',
+            'directory' => 'admin',
             'controller' => 'posts',
-            'action' => 'show'
+            'action' => 'index'
         )
     );
     
@@ -35,29 +36,32 @@ class SegmentRouterTest extends PHPUnit_Framework_TestCase
     
     public function testMatch()
     {
-        $this->assertTrue($this->_router->match('post/something'));
-        $this->assertFalse($this->_router->match('post/foo/bar'));
+        $this->assertTrue($this->_router->match('admin/posts/edit/12'));
+        $this->assertFalse($this->_router->match('admin/posts/edit/foo/bar'));
     }
     
     public function testGetActiveRouteName()
     {
-        $this->assertEquals($this->_router->getActiveRouteName('post/something'), 'post');
-        $this->assertFalse($this->_router->getActiveRouteName('post/foo/bar'));
+        $this->assertEquals($this->_router->getActiveRouteName('admin/posts/edit/12'), 'admin');
+        $this->assertFalse($this->_router->getActiveRouteName('admin/posts/edit/foo/bar'));
     }
     
     public function testRoute()
     {
-        $options = $this->_router->route('post');
+        $options = $this->_router->route('admin');
         $this->assertEquals(gettype($options), 'array');
         $this->assertEquals($options['module'], 'blog');
+        $this->assertEquals($options['directory'], 'admin');
         $this->assertEquals($options['controller'], 'posts');
-        $this->assertEquals($options['action'], 'show');
+        $this->assertEquals($options['action'], 'index');
         $this->assertEquals(gettype($options['params']), 'array');
         $this->assertEquals($options['params'], $_GET);
     }
     
     public function testCreateUrl()
     {
-        $this->assertEquals($this->_router->createUrl('post/<slug>', array('slug' => 'something')), 'post/something');
+        $this->assertEquals($this->_router->createUrl('admin(/<controller>(/<action>(/<id>)))',
+                                                       array('controller' => 'posts', 'action' => 'edit', 'id' => 12)),
+                            'admin/posts/edit/12');
     }
 }
